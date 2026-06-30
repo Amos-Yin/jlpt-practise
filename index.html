@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JLPT N5 日語學習平台</title>
+<style>
+:root {
+  --primary: #e63946;
+  --primary-dark: #c1121f;
+  --bg: #f5f5f5;
+  --card: #ffffff;
+  --text: #333333;
+  --text-light: #666666;
+  --border: #e0e0e0;
+  --accent: #457b9d;
+  --success: #2a9d8f;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+header {
+  background: var(--primary);
+  color: white;
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+}
+.logo { font-size: 1.3rem; font-weight: 700; }
+.logo span {
+  background: white;
+  color: var(--primary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-right: 8px;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+nav { display: flex; gap: 4px; }
+nav button {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.85);
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+nav button:hover, nav button.active {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  font-weight: 600;
+}
+
+/* ── Main ── */
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+/* ── Pages ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── Home ── */
+.hero { text-align: center; padding: 48px 20px 32px; }
+.hero h1 { font-size: 2.2rem; color: var(--primary); margin-bottom: 10px; }
+.hero p { color: var(--text-light); font-size: 1.05rem; margin-bottom: 40px; }
+
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.level-card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 24px 12px;
+  text-align: center;
+  border: 2px solid var(--border);
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.level-card.available { cursor: pointer; }
+.level-card.available:hover {
+  border-color: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(230,57,70,0.15);
+}
+.level-card.locked { opacity: 0.55; cursor: not-allowed; }
+.level-badge {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 6px;
+}
+.level-name { font-size: 0.8rem; color: var(--text-light); }
+.level-status {
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-top: 8px;
+}
+.available .level-status { background: #e8f5e9; color: #2e7d32; }
+.locked .level-status { background: #f5f5f5; color: #999; }
+
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 40px;
+}
+.stat-card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.stat-num { font-size: 2rem; font-weight: 700; color: var(--primary); }
+.stat-label { color: var(--text-light); font-size: 0.88rem; margin-top: 4px; }
+
+/* ── Page Header ── */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.page-header h2 { font-size: 1.4rem; }
+.search-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+.search-bar input {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  width: 210px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-bar input:focus { border-color: var(--primary); }
+.search-bar select {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: white;
+  cursor: pointer;
+  outline: none;
+}
+
+/* ── Vocab Table ── */
+.vocab-table-wrapper {
+  background: var(--card);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.vocab-table { width: 100%; border-collapse: collapse; }
+.vocab-table thead { background: var(--primary); color: white; }
+.vocab-table th { padding: 12px 16px; text-align: left; font-weight: 600; font-size: 0.88rem; }
+.vocab-table td { padding: 11px 16px; border-bottom: 1px solid var(--border); font-size: 0.93rem; }
+.vocab-table tr:last-child td { border-bottom: none; }
+.vocab-table tbody tr:hover td { background: #fff8f8; }
+.kanji-text { font-size: 1.15rem; font-weight: 600; }
+.kana-text { font-size: 0.8rem; color: var(--text-light); display: block; margin-top: 2px; }
+
+.pos-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.pos-動詞     { background:#e3f2fd; color:#1565c0; }
+.pos-名詞     { background:#f3e5f5; color:#6a1b9a; }
+.pos-い形容詞  { background:#e8f5e9; color:#2e7d32; }
+.pos-な形容詞  { background:#fff3e0; color:#e65100; }
+.pos-副詞     { background:#fce4ec; color:#880e4f; }
+.pos-代名詞   { background:#fff8e1; color:#f57f17; }
+.pos-表現     { background:#e8eaf6; color:#283593; }
+
+.audio-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 9px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  color: var(--text-light);
+}
+.audio-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+.vocab-info {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin-bottom: 10px;
+}
+
+/* ── Pagination ── */
+.pagination { display: flex; justify-content: center; gap: 6px; margin-top: 18px; flex-wrap: wrap; }
+.page-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+}
+.page-btn:hover, .page-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* ── Grammar ── */
+.grammar-list { display: flex; flex-direction: column; gap: 10px; }
+.grammar-card {
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: box-shadow 0.2s;
+}
+.grammar-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+.grammar-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  cursor: pointer;
+  gap: 14px;
+  user-select: none;
+}
+.grammar-pattern { font-size: 1.1rem; font-weight: 700; color: var(--primary); min-width: 170px; }
+.grammar-meaning { color: var(--text); font-size: 0.93rem; flex: 1; }
+.grammar-toggle { color: var(--text-light); transition: transform 0.25s; flex-shrink: 0; }
+.grammar-card.open .grammar-toggle { transform: rotate(180deg); }
+.grammar-body { display: none; padding: 0 20px 18px; border-top: 1px solid var(--border); }
+.grammar-card.open .grammar-body { display: block; }
+.grammar-usage {
+  color: var(--text-light);
+  font-size: 0.88rem;
+  margin: 12px 0 8px;
+  line-height: 1.6;
+}
+.example-box {
+  background: #f8f9fa;
+  border-left: 3px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin-top: 8px;
+}
+.example-jp { font-size: 1.05rem; font-weight: 600; }
+.example-kana { font-size: 0.82rem; color: var(--text-light); margin-top: 2px; }
+.example-zh { font-size: 0.88rem; color: var(--accent); margin-top: 4px; }
+.grammar-audio {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 12px;
+  color: var(--text-light);
+  transition: all 0.2s;
+}
+.grammar-audio:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* ── Quiz ── */
+.quiz-container { max-width: 680px; margin: 0 auto; }
+.quiz-setup {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 36px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.quiz-setup h2 { font-size: 1.5rem; margin-bottom: 8px; }
+.quiz-setup p { color: var(--text-light); margin-bottom: 24px; }
+.quiz-type-grid {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.qtype-btn {
+  padding: 11px 22px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  background: white;
+  transition: all 0.2s;
+}
+.qtype-btn:hover, .qtype-btn.selected {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: white;
+}
+.count-select { margin-bottom: 20px; }
+.count-select label { font-size: 0.9rem; color: var(--text-light); margin-right: 8px; }
+.count-select select {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  outline: none;
+}
+.start-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 13px 48px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.start-btn:hover { background: var(--primary-dark); }
+
+/* Quiz active */
+.quiz-active { display: none; }
+.quiz-active.show { display: block; }
+.quiz-setup.hide { display: none; }
+.quiz-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: var(--text-light);
+  margin-bottom: 10px;
+}
+.progress-bar { height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 22px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.4s; }
+.quiz-question {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  margin-bottom: 14px;
+}
+.quiz-word { font-size: 2.4rem; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+.quiz-hint { font-size: 0.85rem; color: var(--text-light); }
+.quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.opt-btn {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 15px 18px;
+  font-size: 0.93rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  line-height: 1.4;
+}
+.opt-btn:hover:not(:disabled) { border-color: var(--primary); background: #fff5f5; }
+.opt-btn.correct { border-color: var(--success); background: #e8f8f7; color: var(--success); }
+.opt-btn.wrong { border-color: var(--primary); background: #fff0f1; color: var(--primary); }
+.next-btn {
+  width: 100%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 13px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 12px;
+  display: none;
+  transition: background 0.2s;
+}
+.next-btn.show { display: block; }
+.next-btn:hover { background: var(--primary-dark); }
+
+/* Results */
+.quiz-results {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  display: none;
+}
+.quiz-results.show { display: block; }
+.result-emoji { font-size: 3rem; }
+.result-title { font-size: 1.4rem; font-weight: 700; margin-top: 10px; }
+.result-score { font-size: 3.5rem; font-weight: 800; color: var(--primary); margin: 12px 0; }
+.result-msg { color: var(--text-light); font-size: 1rem; margin-bottom: 24px; }
+.result-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.retry-btn, .back-btn {
+  padding: 11px 32px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.retry-btn { background: var(--primary); color: white; border: none; }
+.retry-btn:hover { background: var(--primary-dark); }
+.back-btn { background: white; color: var(--text); border: 1px solid var(--border); }
+.back-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ── Responsive ── */
+@media (max-width: 650px) {
+  .header-inner { flex-wrap: wrap; height: auto; padding: 10px 0; gap: 8px; }
+  nav button { padding: 6px 10px; font-size: 0.82rem; }
+  .level-grid { grid-template-columns: repeat(3, 1fr); }
+  .stats-bar { grid-template-columns: 1fr 1fr; }
+  .quiz-options { grid-template-columns: 1fr; }
+  .grammar-pattern { min-width: 120px; }
+  .vocab-table th:nth-child(2), .vocab-table td:nth-child(2) { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo"><span>N5</span>日語學習平台</div>
+    <nav>
+      <button class="active" onclick="showPage('home')">🏠 首頁</button>
+      <button onclick="showPage('vocab')">📖 單字</button>
+      <button onclick="showPage('grammar')">📝 文法</button>
+      <button onclick="showPage('quiz')">⚡ 測驗</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== 首頁 ===== -->
+  <div id="page-home" class="page active">
+    <div class="hero">
+      <h1>🇯🇵 日語學習平台</h1>
+      <p>從 N5 基礎開始，踏上學習日語的旅程！</p>
+      <div class="level-grid">
+        <div class="level-card available" onclick="showPage('vocab')">
+          <span class="level-badge">N5</span>
+          <div class="level-name">基礎入門</div>
+          <span class="level-status">✓ 可使用</span>
+        </div>
+        <div class="level-card locked">
+          <span class="level-badge">N4</span>
+          <div class="level-name">初　　級</div>
+          <span class="level-status">🔒 即將推出</span>
+        </div>
+        <div class="level-card locked">
+          <span class="level-badge">N3</span>
+          <div class="level-name">中　　級</div>
+          <span class="level-status">🔒 即將推出</span>
+        </div>
+        <div class="level-card locked">
+          <span class="level-badge">N2</span>
+          <div class="level-name">中上　級</div>
+          <span class="level-status">🔒 即將推出</span>
+        </div>
+        <div class="level-card locked">
+          <span class="level-badge">N1</span>
+          <div class="level-name">高　　級</div>
+          <span class="level-status">🔒 即將推出</span>
+        </div>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-num">220+</div><div class="stat-label">N5 單字</div></div>
+      <div class="stat-card"><div class="stat-num">40</div><div class="stat-label">N5 文法句型</div></div>
+      <div class="stat-card"><div class="stat-num">∞</div><div class="stat-label">隨機練習題</div></div>
+    </div>
+  </div>
+
+  <!-- ===== 單字 ===== -->
+  <div id="page-vocab" class="page">
+    <div class="page-header">
+      <h2>📖 N5 單字表</h2>
+      <div class="search-bar">
+        <input type="text" id="vocab-search" placeholder="搜尋單字 / 意思..." oninput="filterVocab()">
+        <select id="pos-filter" onchange="filterVocab()">
+          <option value="">所有詞性</option>
+          <option value="動詞">動詞</option>
+          <option value="名詞">名詞</option>
+          <option value="い形容詞">い形容詞</option>
+          <option value="な形容詞">な形容詞</option>
+          <option value="副詞">副詞</option>
+          <option value="代名詞">代名詞</option>
+          <option value="表現">表現</option>
+        </select>
+      </div>
+    </div>
+    <div class="vocab-info" id="vocab-info"></div>
+    <div class="vocab-table-wrapper">
+      <table class="vocab-table">
+        <thead>
+          <tr>
+            <th>單字</th>
+            <th>詞性</th>
+            <th>中文意思</th>
+            <th>語音</th>
+          </tr>
+        </thead>
+        <tbody id="vocab-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="vocab-pagination"></div>
+  </div>
+
+  <!-- ===== 文法 ===== -->
+  <div id="page-grammar" class="page">
+    <div class="page-header">
+      <h2>📝 N5 文法</h2>
+      <div class="search-bar">
+        <input type="text" id="grammar-search" placeholder="搜尋文法..." oninput="renderGrammar()">
+      </div>
+    </div>
+    <div class="grammar-list" id="grammar-list"></div>
+  </div>
+
+  <!-- ===== 測驗 ===== -->
+  <div id="page-quiz" class="page">
+    <div class="quiz-container">
+
+      <div class="quiz-setup" id="quiz-setup">
+        <h2>⚡ 隨機測驗</h2>
+        <p>選擇測驗類型，開始練習 N5 單字！</p>
+        <div class="quiz-type-grid">
+          <button class="qtype-btn selected" onclick="selectType('meaning',this)">看單字 → 選意思</button>
+          <button class="qtype-btn" onclick="selectType('word',this)">看意思 → 選單字</button>
+          <button class="qtype-btn" onclick="selectType('reading',this)">看漢字 → 選讀音</button>
+        </div>
+        <div class="count-select">
+          <label>題數：</label>
+          <select id="quiz-count-sel">
+            <option value="10">10 題</option>
+            <option value="20">20 題</option>
+            <option value="30">30 題</option>
+          </select>
+        </div>
+        <button class="start-btn" onclick="startQuiz()">開始測驗 →</button>
+      </div>
+
+      <div class="quiz-active" id="quiz-active">
+        <div class="quiz-top">
+          <span id="q-count">第 1 題 / 共 10 題</span>
+          <span id="q-score">得分：0</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <div class="quiz-question">
+          <div class="quiz-word" id="quiz-word"></div>
+          <div class="quiz-hint" id="quiz-hint"></div>
+        </div>
+        <div class="quiz-options" id="quiz-options"></div>
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">下一題 →</button>
+      </div>
+
+      <div class="quiz-results" id="quiz-results">
+        <div class="result-emoji" id="result-emoji">🎉</div>
+        <div class="result-title">測驗完成！</div>
+        <div class="result-score" id="result-score"></div>
+        <div class="result-msg" id="result-msg"></div>
+        <div class="result-btns">
+          <button class="retry-btn" onclick="startQuiz()">再測一次</button>
+          <button class="back-btn" onclick="resetQuiz()">回到設定</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ═══════════════════════════════
+//  單字資料
+// ═══════════════════════════════
+const vocabData = [
+  // 代名詞
+  {k:'私',r:'わたし',p:'代名詞',m:'我'},
+  {k:'あなた',r:'あなた',p:'代名詞',m:'你'},
+  {k:'彼',r:'かれ',p:'代名詞',m:'他；男朋友'},
+  {k:'彼女',r:'かのじょ',p:'代名詞',m:'她；女朋友'},
+  {k:'みんな',r:'みんな',p:'代名詞',m:'大家；所有人'},
+  {k:'これ',r:'これ',p:'代名詞',m:'這個（靠近說話者）'},
+  {k:'それ',r:'それ',p:'代名詞',m:'那個（靠近對方）'},
+  {k:'あれ',r:'あれ',p:'代名詞',m:'那個（遠離雙方）'},
+  {k:'どれ',r:'どれ',p:'代名詞',m:'哪一個'},
+  {k:'ここ',r:'ここ',p:'代名詞',m:'這裡'},
+  {k:'そこ',r:'そこ',p:'代名詞',m:'那裡（靠近對方）'},
+  {k:'あそこ',r:'あそこ',p:'代名詞',m:'那裡（遠離雙方）'},
+  {k:'どこ',r:'どこ',p:'代名詞',m:'哪裡'},
+  {k:'この',r:'この',p:'代名詞',m:'這個〜（修飾名詞）'},
+  {k:'その',r:'その',p:'代名詞',m:'那個〜（靠近對方）'},
+  {k:'あの',r:'あの',p:'代名詞',m:'那個〜（遠處）'},
+  {k:'どの',r:'どの',p:'代名詞',m:'哪個〜（修飾名詞）'},
+  // 家人
+  {k:'お父さん',r:'おとうさん',p:'名詞',m:'爸爸（他人的）'},
+  {k:'お母さん',r:'おかあさん',p:'名詞',m:'媽媽（他人的）'},
+  {k:'お兄さん',r:'おにいさん',p:'名詞',m:'哥哥（他人的）'},
+  {k:'お姉さん',r:'おねえさん',p:'名詞',m:'姐姐（他人的）'},
+  {k:'弟',r:'おとうと',p:'名詞',m:'弟弟（自己的）'},
+  {k:'妹',r:'いもうと',p:'名詞',m:'妹妹（自己的）'},
+  {k:'家族',r:'かぞく',p:'名詞',m:'家人'},
+  {k:'子供',r:'こども',p:'名詞',m:'小孩'},
+  {k:'友達',r:'ともだち',p:'名詞',m:'朋友'},
+  {k:'先生',r:'せんせい',p:'名詞',m:'老師'},
+  {k:'学生',r:'がくせい',p:'名詞',m:'學生'},
+  {k:'人',r:'ひと',p:'名詞',m:'人'},
+  {k:'男',r:'おとこ',p:'名詞',m:'男人；男性'},
+  {k:'女',r:'おんな',p:'名詞',m:'女人；女性'},
+  // 時間
+  {k:'今日',r:'きょう',p:'名詞',m:'今天'},
+  {k:'明日',r:'あした',p:'名詞',m:'明天'},
+  {k:'昨日',r:'きのう',p:'名詞',m:'昨天'},
+  {k:'今',r:'いま',p:'名詞',m:'現在'},
+  {k:'今年',r:'ことし',p:'名詞',m:'今年'},
+  {k:'来年',r:'らいねん',p:'名詞',m:'明年'},
+  {k:'去年',r:'きょねん',p:'名詞',m:'去年'},
+  {k:'毎日',r:'まいにち',p:'名詞',m:'每天'},
+  {k:'毎週',r:'まいしゅう',p:'名詞',m:'每週'},
+  {k:'毎月',r:'まいつき',p:'名詞',m:'每個月'},
+  {k:'毎年',r:'まいとし',p:'名詞',m:'每年'},
+  {k:'朝',r:'あさ',p:'名詞',m:'早上'},
+  {k:'昼',r:'ひる',p:'名詞',m:'中午；白天'},
+  {k:'夜',r:'よる',p:'名詞',m:'晚上；夜晚'},
+  {k:'午前',r:'ごぜん',p:'名詞',m:'上午'},
+  {k:'午後',r:'ごご',p:'名詞',m:'下午'},
+  {k:'時間',r:'じかん',p:'名詞',m:'時間'},
+  {k:'来週',r:'らいしゅう',p:'名詞',m:'下週'},
+  {k:'先週',r:'せんしゅう',p:'名詞',m:'上週'},
+  {k:'今週',r:'こんしゅう',p:'名詞',m:'本週'},
+  // 場所
+  {k:'学校',r:'がっこう',p:'名詞',m:'學校'},
+  {k:'家',r:'いえ',p:'名詞',m:'家；房子'},
+  {k:'駅',r:'えき',p:'名詞',m:'車站'},
+  {k:'病院',r:'びょういん',p:'名詞',m:'醫院'},
+  {k:'銀行',r:'ぎんこう',p:'名詞',m:'銀行'},
+  {k:'図書館',r:'としょかん',p:'名詞',m:'圖書館'},
+  {k:'店',r:'みせ',p:'名詞',m:'店；商店'},
+  {k:'スーパー',r:'スーパー',p:'名詞',m:'超市'},
+  {k:'公園',r:'こうえん',p:'名詞',m:'公園'},
+  {k:'会社',r:'かいしゃ',p:'名詞',m:'公司'},
+  {k:'郵便局',r:'ゆうびんきょく',p:'名詞',m:'郵局'},
+  {k:'空港',r:'くうこう',p:'名詞',m:'機場'},
+  {k:'レストラン',r:'レストラン',p:'名詞',m:'餐廳'},
+  {k:'ホテル',r:'ホテル',p:'名詞',m:'飯店'},
+  {k:'トイレ',r:'トイレ',p:'名詞',m:'廁所'},
+  {k:'部屋',r:'へや',p:'名詞',m:'房間'},
+  {k:'外',r:'そと',p:'名詞',m:'外面；室外'},
+  {k:'中',r:'なか',p:'名詞',m:'裡面；中間'},
+  {k:'上',r:'うえ',p:'名詞',m:'上面'},
+  {k:'下',r:'した',p:'名詞',m:'下面'},
+  {k:'右',r:'みぎ',p:'名詞',m:'右邊'},
+  {k:'左',r:'ひだり',p:'名詞',m:'左邊'},
+  {k:'前',r:'まえ',p:'名詞',m:'前面；之前'},
+  {k:'後ろ',r:'うしろ',p:'名詞',m:'後面'},
+  // 食物
+  {k:'ご飯',r:'ごはん',p:'名詞',m:'飯；餐食'},
+  {k:'パン',r:'パン',p:'名詞',m:'麵包'},
+  {k:'水',r:'みず',p:'名詞',m:'水'},
+  {k:'お茶',r:'おちゃ',p:'名詞',m:'茶'},
+  {k:'コーヒー',r:'コーヒー',p:'名詞',m:'咖啡'},
+  {k:'ビール',r:'ビール',p:'名詞',m:'啤酒'},
+  {k:'肉',r:'にく',p:'名詞',m:'肉'},
+  {k:'魚',r:'さかな',p:'名詞',m:'魚'},
+  {k:'野菜',r:'やさい',p:'名詞',m:'蔬菜'},
+  {k:'果物',r:'くだもの',p:'名詞',m:'水果'},
+  {k:'卵',r:'たまご',p:'名詞',m:'雞蛋'},
+  {k:'牛乳',r:'ぎゅうにゅう',p:'名詞',m:'牛奶'},
+  {k:'りんご',r:'りんご',p:'名詞',m:'蘋果'},
+  {k:'みかん',r:'みかん',p:'名詞',m:'橘子'},
+  // 顏色
+  {k:'赤',r:'あか',p:'名詞',m:'紅色'},
+  {k:'青',r:'あお',p:'名詞',m:'藍色；綠色'},
+  {k:'白',r:'しろ',p:'名詞',m:'白色'},
+  {k:'黒',r:'くろ',p:'名詞',m:'黑色'},
+  {k:'黄色',r:'きいろ',p:'名詞',m:'黃色'},
+  {k:'緑',r:'みどり',p:'名詞',m:'綠色'},
+  // い形容詞
+  {k:'大きい',r:'おおきい',p:'い形容詞',m:'大的'},
+  {k:'小さい',r:'ちいさい',p:'い形容詞',m:'小的'},
+  {k:'新しい',r:'あたらしい',p:'い形容詞',m:'新的'},
+  {k:'古い',r:'ふるい',p:'い形容詞',m:'舊的；老的'},
+  {k:'いい／良い',r:'いい／よい',p:'い形容詞',m:'好的'},
+  {k:'悪い',r:'わるい',p:'い形容詞',m:'壞的；不好的'},
+  {k:'高い',r:'たかい',p:'い形容詞',m:'高的；貴的'},
+  {k:'低い',r:'ひくい',p:'い形容詞',m:'低的'},
+  {k:'安い',r:'やすい',p:'い形容詞',m:'便宜的'},
+  {k:'多い',r:'おおい',p:'い形容詞',m:'多的'},
+  {k:'少ない',r:'すくない',p:'い形容詞',m:'少的'},
+  {k:'長い',r:'ながい',p:'い形容詞',m:'長的'},
+  {k:'短い',r:'みじかい',p:'い形容詞',m:'短的'},
+  {k:'速い',r:'はやい',p:'い形容詞',m:'快的'},
+  {k:'遅い',r:'おそい',p:'い形容詞',m:'慢的；晚的'},
+  {k:'熱い',r:'あつい',p:'い形容詞',m:'熱的（觸碰）'},
+  {k:'冷たい',r:'つめたい',p:'い形容詞',m:'冷的（觸碰）'},
+  {k:'暑い',r:'あつい',p:'い形容詞',m:'熱的（天氣）'},
+  {k:'寒い',r:'さむい',p:'い形容詞',m:'冷的（天氣）'},
+  {k:'難しい',r:'むずかしい',p:'い形容詞',m:'困難的'},
+  {k:'易しい',r:'やさしい',p:'い形容詞',m:'容易的'},
+  {k:'面白い',r:'おもしろい',p:'い形容詞',m:'有趣的'},
+  {k:'つまらない',r:'つまらない',p:'い形容詞',m:'無聊的'},
+  {k:'楽しい',r:'たのしい',p:'い形容詞',m:'快樂的；開心的'},
+  {k:'悲しい',r:'かなしい',p:'い形容詞',m:'悲傷的'},
+  {k:'かわいい',r:'かわいい',p:'い形容詞',m:'可愛的'},
+  {k:'忙しい',r:'いそがしい',p:'い形容詞',m:'忙碌的'},
+  {k:'広い',r:'ひろい',p:'い形容詞',m:'寬廣的'},
+  {k:'狭い',r:'せまい',p:'い形容詞',m:'狹窄的'},
+  {k:'重い',r:'おもい',p:'い形容詞',m:'重的'},
+  {k:'軽い',r:'かるい',p:'い形容詞',m:'輕的'},
+  {k:'明るい',r:'あかるい',p:'い形容詞',m:'明亮的'},
+  {k:'暗い',r:'くらい',p:'い形容詞',m:'黑暗的'},
+  {k:'危ない',r:'あぶない',p:'い形容詞',m:'危險的'},
+  {k:'痛い',r:'いたい',p:'い形容詞',m:'痛的'},
+  {k:'眠い',r:'ねむい',p:'い形容詞',m:'睏的；想睡的'},
+  {k:'嬉しい',r:'うれしい',p:'い形容詞',m:'高興的；開心的'},
+  {k:'怖い',r:'こわい',p:'い形容詞',m:'可怕的；害怕的'},
+  // な形容詞
+  {k:'きれい',r:'きれい',p:'な形容詞',m:'漂亮的；乾淨的'},
+  {k:'有名',r:'ゆうめい',p:'な形容詞',m:'有名的'},
+  {k:'親切',r:'しんせつ',p:'な形容詞',m:'親切的'},
+  {k:'大丈夫',r:'だいじょうぶ',p:'な形容詞',m:'沒問題的；沒關係'},
+  {k:'静か',r:'しずか',p:'な形容詞',m:'安靜的'},
+  {k:'賑やか',r:'にぎやか',p:'な形容詞',m:'熱鬧的'},
+  {k:'好き',r:'すき',p:'な形容詞',m:'喜歡的'},
+  {k:'嫌い',r:'きらい',p:'な形容詞',m:'討厭的'},
+  {k:'上手',r:'じょうず',p:'な形容詞',m:'擅長的'},
+  {k:'下手',r:'へた',p:'な形容詞',m:'不擅長的'},
+  {k:'便利',r:'べんり',p:'な形容詞',m:'方便的'},
+  {k:'不便',r:'ふべん',p:'な形容詞',m:'不方便的'},
+  {k:'元気',r:'げんき',p:'な形容詞',m:'健康的；有精神的'},
+  {k:'暇',r:'ひま',p:'な形容詞',m:'空閒的'},
+  {k:'大切',r:'たいせつ',p:'な形容詞',m:'重要的；珍貴的'},
+  {k:'丁寧',r:'ていねい',p:'な形容詞',m:'有禮貌的；仔細的'},
+  {k:'素敵',r:'すてき',p:'な形容詞',m:'美好的；棒的'},
+  {k:'簡単',r:'かんたん',p:'な形容詞',m:'簡單的'},
+  // 動詞
+  {k:'食べる',r:'たべる',p:'動詞',m:'吃'},
+  {k:'飲む',r:'のむ',p:'動詞',m:'喝'},
+  {k:'行く',r:'いく',p:'動詞',m:'去'},
+  {k:'来る',r:'くる',p:'動詞',m:'來'},
+  {k:'帰る',r:'かえる',p:'動詞',m:'回去；回家'},
+  {k:'見る',r:'みる',p:'動詞',m:'看'},
+  {k:'聞く',r:'きく',p:'動詞',m:'聽；問'},
+  {k:'話す',r:'はなす',p:'動詞',m:'說話；講'},
+  {k:'読む',r:'よむ',p:'動詞',m:'讀；閱讀'},
+  {k:'書く',r:'かく',p:'動詞',m:'寫'},
+  {k:'買う',r:'かう',p:'動詞',m:'買'},
+  {k:'売る',r:'うる',p:'動詞',m:'賣'},
+  {k:'使う',r:'つかう',p:'動詞',m:'使用'},
+  {k:'働く',r:'はたらく',p:'動詞',m:'工作'},
+  {k:'休む',r:'やすむ',p:'動詞',m:'休息；請假'},
+  {k:'起きる',r:'おきる',p:'動詞',m:'起床；發生'},
+  {k:'寝る',r:'ねる',p:'動詞',m:'睡覺'},
+  {k:'着る',r:'きる',p:'動詞',m:'穿（上衣）'},
+  {k:'脱ぐ',r:'ぬぐ',p:'動詞',m:'脫（衣服）'},
+  {k:'洗う',r:'あらう',p:'動詞',m:'洗'},
+  {k:'開ける',r:'あける',p:'動詞',m:'打開'},
+  {k:'閉める',r:'しめる',p:'動詞',m:'關閉'},
+  {k:'入る',r:'はいる',p:'動詞',m:'進入'},
+  {k:'出る',r:'でる',p:'動詞',m:'出去；出來'},
+  {k:'会う',r:'あう',p:'動詞',m:'見面'},
+  {k:'知る',r:'しる',p:'動詞',m:'知道；認識'},
+  {k:'分かる',r:'わかる',p:'動詞',m:'明白；了解'},
+  {k:'思う',r:'おもう',p:'動詞',m:'認為；思考'},
+  {k:'言う',r:'いう',p:'動詞',m:'說；稱'},
+  {k:'する',r:'する',p:'動詞',m:'做；進行'},
+  {k:'待つ',r:'まつ',p:'動詞',m:'等待'},
+  {k:'持つ',r:'もつ',p:'動詞',m:'拿；持有'},
+  {k:'乗る',r:'のる',p:'動詞',m:'乘坐；搭乘'},
+  {k:'降りる',r:'おりる',p:'動詞',m:'下車；下樓'},
+  {k:'泳ぐ',r:'およぐ',p:'動詞',m:'游泳'},
+  {k:'走る',r:'はしる',p:'動詞',m:'跑步'},
+  {k:'歩く',r:'あるく',p:'動詞',m:'走路'},
+  {k:'あげる',r:'あげる',p:'動詞',m:'給（對方）；贈予'},
+  {k:'もらう',r:'もらう',p:'動詞',m:'收到；獲得'},
+  {k:'くれる',r:'くれる',p:'動詞',m:'給（我）'},
+  {k:'作る',r:'つくる',p:'動詞',m:'製作；做'},
+  {k:'貸す',r:'かす',p:'動詞',m:'借出；出借'},
+  {k:'借りる',r:'かりる',p:'動詞',m:'借用'},
+  {k:'教える',r:'おしえる',p:'動詞',m:'教；告訴'},
+  {k:'習う',r:'ならう',p:'動詞',m:'學習；學'},
+  {k:'勉強する',r:'べんきょうする',p:'動詞',m:'學習；念書'},
+  {k:'電話する',r:'でんわする',p:'動詞',m:'打電話'},
+  {k:'できる',r:'できる',p:'動詞',m:'能；會；完成'},
+  {k:'ある',r:'ある',p:'動詞',m:'有（無生命）；存在'},
+  {k:'いる',r:'いる',p:'動詞',m:'有（有生命）；在'},
+  {k:'切る',r:'きる',p:'動詞',m:'切；剪'},
+  {k:'押す',r:'おす',p:'動詞',m:'推；按'},
+  {k:'引く',r:'ひく',p:'動詞',m:'拉；減'},
+  {k:'撮る',r:'とる',p:'動詞',m:'拍照'},
+  {k:'飛ぶ',r:'とぶ',p:'動詞',m:'飛；跳'},
+  {k:'止まる',r:'とまる',p:'動詞',m:'停止；住宿'},
+  // 物品
+  {k:'本',r:'ほん',p:'名詞',m:'書'},
+  {k:'新聞',r:'しんぶん',p:'名詞',m:'報紙'},
+  {k:'雑誌',r:'ざっし',p:'名詞',m:'雜誌'},
+  {k:'映画',r:'えいが',p:'名詞',m:'電影'},
+  {k:'音楽',r:'おんがく',p:'名詞',m:'音樂'},
+  {k:'テレビ',r:'テレビ',p:'名詞',m:'電視'},
+  {k:'電話',r:'でんわ',p:'名詞',m:'電話'},
+  {k:'携帯',r:'けいたい',p:'名詞',m:'手機'},
+  {k:'時計',r:'とけい',p:'名詞',m:'時鐘；手錶'},
+  {k:'財布',r:'さいふ',p:'名詞',m:'錢包'},
+  {k:'かばん',r:'かばん',p:'名詞',m:'包包；書包'},
+  {k:'傘',r:'かさ',p:'名詞',m:'雨傘'},
+  {k:'服',r:'ふく',p:'名詞',m:'衣服'},
+  {k:'靴',r:'くつ',p:'名詞',m:'鞋子'},
+  {k:'帽子',r:'ぼうし',p:'名詞',m:'帽子'},
+  {k:'眼鏡',r:'めがね',p:'名詞',m:'眼鏡'},
+  {k:'お金',r:'おかね',p:'名詞',m:'錢'},
+  {k:'切符',r:'きっぷ',p:'名詞',m:'票；車票'},
+  {k:'鍵',r:'かぎ',p:'名詞',m:'鑰匙；鎖'},
+  {k:'写真',r:'しゃしん',p:'名詞',m:'照片'},
+  // 自然/天氣
+  {k:'天気',r:'てんき',p:'名詞',m:'天氣'},
+  {k:'雨',r:'あめ',p:'名詞',m:'雨'},
+  {k:'雪',r:'ゆき',p:'名詞',m:'雪'},
+  {k:'風',r:'かぜ',p:'名詞',m:'風'},
+  {k:'空',r:'そら',p:'名詞',m:'天空'},
+  {k:'山',r:'やま',p:'名詞',m:'山'},
+  {k:'川',r:'かわ',p:'名詞',m:'河川'},
+  {k:'海',r:'うみ',p:'名詞',m:'海'},
+  {k:'花',r:'はな',p:'名詞',m:'花'},
+  {k:'木',r:'き',p:'名詞',m:'樹；木頭'},
+  // 副詞
+  {k:'とても',r:'とても',p:'副詞',m:'非常；很'},
+  {k:'あまり',r:'あまり',p:'副詞',m:'不太〜（接否定）'},
+  {k:'全然',r:'ぜんぜん',p:'副詞',m:'完全不〜（接否定）'},
+  {k:'もう',r:'もう',p:'副詞',m:'已經；再'},
+  {k:'まだ',r:'まだ',p:'副詞',m:'還；仍然'},
+  {k:'よく',r:'よく',p:'副詞',m:'經常；很好地'},
+  {k:'たくさん',r:'たくさん',p:'副詞',m:'很多；大量'},
+  {k:'すこし',r:'すこし',p:'副詞',m:'一點；稍微'},
+  {k:'いつも',r:'いつも',p:'副詞',m:'總是；一直'},
+  {k:'ときどき',r:'ときどき',p:'副詞',m:'有時候'},
+  {k:'たいてい',r:'たいてい',p:'副詞',m:'通常；大多'},
+  {k:'はじめて',r:'はじめて',p:'副詞',m:'第一次'},
+  {k:'いっしょに',r:'いっしょに',p:'副詞',m:'一起'},
+  {k:'ゆっくり',r:'ゆっくり',p:'副詞',m:'慢慢地；輕鬆地'},
+  {k:'もちろん',r:'もちろん',p:'副詞',m:'當然'},
+  {k:'だいたい',r:'だいたい',p:'副詞',m:'大約；大致上'},
+  {k:'はやく',r:'はやく',p:'副詞',m:'快點；早點'},
+  // 表現
+  {k:'おはようございます',r:'おはようございます',p:'表現',m:'早安'},
+  {k:'こんにちは',r:'こんにちは',p:'表現',m:'你好（白天用）'},
+  {k:'こんばんは',r:'こんばんは',p:'表現',m:'晚上好（問候）'},
+  {k:'おやすみなさい',r:'おやすみなさい',p:'表現',m:'晚安（道別）'},
+  {k:'ありがとうございます',r:'ありがとうございます',p:'表現',m:'謝謝你'},
+  {k:'すみません',r:'すみません',p:'表現',m:'不好意思；對不起'},
+  {k:'ごめんなさい',r:'ごめんなさい',p:'表現',m:'對不起（道歉）'},
+  {k:'はじめまして',r:'はじめまして',p:'表現',m:'初次見面'},
+  {k:'よろしくお願いします',r:'よろしくおねがいします',p:'表現',m:'請多關照'},
+  {k:'いただきます',r:'いただきます',p:'表現',m:'我要開動了'},
+  {k:'ごちそうさまでした',r:'ごちそうさまでした',p:'表現',m:'我吃飽了；謝謝款待'},
+  {k:'いってきます',r:'いってきます',p:'表現',m:'我出門了'},
+  {k:'いってらっしゃい',r:'いってらっしゃい',p:'表現',m:'慢走；路上小心'},
+  {k:'ただいま',r:'ただいま',p:'表現',m:'我回來了'},
+  {k:'おかえりなさい',r:'おかえりなさい',p:'表現',m:'歡迎回來'},
+];
+
+// ═══════════════════════════════
+//  文法資料
+// ═══════════════════════════════
+const grammarData = [
+  {
+    pt:'〜は〜です', mn:'〜是〜',
+    us:'「は」是主題助詞，「です」表示「是」。用於陳述某人／物的身份或狀態。',
+    ex:'私は学生です。', ek:'わたしはがくせいです。', ez:'我是學生。'
+  },
+  {
+    pt:'〜が〜', mn:'（主語）〜',
+    us:'「が」是主格助詞，標示句子的主語，特別用於強調、描述能力、感情或存在。',
+    ex:'猫が好きです。', ek:'ねこがすきです。', ez:'我喜歡貓。'
+  },
+  {
+    pt:'〜を〜', mn:'〜（受詞）',
+    us:'「を」標示動詞的直接受詞（動作對象），只用於及物動詞。',
+    ex:'りんごを食べます。', ek:'りんごをたべます。', ez:'吃蘋果。'
+  },
+  {
+    pt:'〜に〜', mn:'在〜；到〜；向〜',
+    us:'「に」表示目標方向（行き先）、存在地點（いる／ある的前面）、時間點，或給予對象。',
+    ex:'東京に行きます。', ek:'とうきょうにいきます。', ez:'去東京。'
+  },
+  {
+    pt:'〜で〜', mn:'在〜（做某事）；用〜',
+    us:'「で」表示動作發生的場所（不含存在），或使用的工具、交通手段。',
+    ex:'図書館で勉強します。', ek:'としょかんでべんきょうします。', ez:'在圖書館學習。'
+  },
+  {
+    pt:'〜も〜', mn:'〜也〜',
+    us:'「も」表示「也」，用於列舉相同屬性的事物，可取代は／が／を使用。',
+    ex:'私も日本語を勉強します。', ek:'わたしもにほんごをべんきょうします。', ez:'我也學日語。'
+  },
+  {
+    pt:'〜と〜', mn:'〜和〜；和〜一起',
+    us:'「と」用於完全列舉（和…和…），或表示一起行動的對象「和某人一起」。',
+    ex:'友達と映画を見ます。', ek:'ともだちとえいがをみます。', ez:'和朋友看電影。'
+  },
+  {
+    pt:'から〜まで', mn:'從〜到〜',
+    us:'「から」表示起點（時間或地點），「まで」表示終點。兩者可單獨使用。',
+    ex:'9時から5時まで働きます。', ek:'くじからごじまではたらきます。', ez:'從9點工作到5點。'
+  },
+  {
+    pt:'〜の〜', mn:'〜的〜',
+    us:'「の」連接兩個名詞，表示所有關係或修飾關係，相當於中文的「的」。',
+    ex:'私の本です。', ek:'わたしのほんです。', ez:'這是我的書。'
+  },
+  {
+    pt:'〜へ〜', mn:'往〜；向〜',
+    us:'「へ」（讀作e）表示移動的方向，和「に」類似但更強調方向性，不強調到達。',
+    ex:'学校へ行きます。', ek:'がっこうへいきます。', ez:'往學校走。'
+  },
+  {
+    pt:'〜や〜など', mn:'〜和〜等',
+    us:'「や」用於不完全列舉，表示「…和…等」，暗示還有其他項目沒有說出來。',
+    ex:'本やノートを買いました。', ek:'ほんやノートをかいました。', ez:'買了書和筆記本等。'
+  },
+  {
+    pt:'〜ね／〜よ', mn:'是吧（確認）／喔（告知）',
+    us:'「ね」用於尋求對方同意或確認。「よ」用於向對方傳達新資訊或表示強調。',
+    ex:'いい天気ですね。', ek:'いいてんきですね。', ez:'天氣真好呢。'
+  },
+  {
+    pt:'〜か', mn:'〜嗎？（疑問）',
+    us:'句尾加「か」表示疑問，相當於中文的「嗎？」語調不需要特別上揚。',
+    ex:'日本人ですか。', ek:'にほんじんですか。', ez:'你是日本人嗎？'
+  },
+  {
+    pt:'〜ます／〜ません', mn:'（做）〜 ／ 不（做）〜',
+    us:'「ます」是動詞禮貌現在／未來式，表示習慣或預定動作。「ません」是其否定形。',
+    ex:'毎朝コーヒーを飲みます。', ek:'まいあさコーヒーをのみます。', ez:'每天早上喝咖啡。'
+  },
+  {
+    pt:'〜ました／〜ませんでした', mn:'（做）了〜 ／ 沒（做）〜',
+    us:'「ました」是動詞禮貌過去式，表示已完成。「ませんでした」是過去否定。',
+    ex:'昨日映画を見ました。', ek:'きのうえいがをみました。', ez:'昨天看了電影。'
+  },
+  {
+    pt:'〜ている', mn:'正在〜；（狀態持續）',
+    us:'動詞て形＋いる，表示動作進行中，或動作完成後的持續狀態（如「結婚している」）。',
+    ex:'今、ご飯を食べています。', ek:'いま、ごはんをたべています。', ez:'現在正在吃飯。'
+  },
+  {
+    pt:'〜てください', mn:'請（做）〜',
+    us:'動詞て形＋ください，表示禮貌的請求或指示對方做某事。',
+    ex:'ここに名前を書いてください。', ek:'ここになまえをかいてください。', ez:'請在這裡寫名字。'
+  },
+  {
+    pt:'〜てもいいですか', mn:'可以〜嗎？',
+    us:'動詞て形＋もいいですか，用於詢問對方是否允許做某事，語氣較客氣。',
+    ex:'写真を撮ってもいいですか。', ek:'しゃしんをとってもいいですか。', ez:'可以拍照嗎？'
+  },
+  {
+    pt:'〜てはいけません', mn:'不可以〜',
+    us:'動詞て形＋はいけません，表示明確禁止，不能做某事，語氣較強烈。',
+    ex:'ここで走ってはいけません。', ek:'ここではしってはいけません。', ez:'在這裡不可以跑步。'
+  },
+  {
+    pt:'〜ないでください', mn:'請不要〜',
+    us:'動詞ない形（去い）＋でください，禮貌地請求對方不要做某件事。',
+    ex:'タバコを吸わないでください。', ek:'タバコをすわないでください。', ez:'請不要抽菸。'
+  },
+  {
+    pt:'〜たい', mn:'想要〜',
+    us:'動詞ます形去ます＋たい，表示說話者自己的願望或想做的事。第三人稱用「〜たがっている」。',
+    ex:'日本に行きたいです。', ek:'にほんにいきたいです。', ez:'想去日本。'
+  },
+  {
+    pt:'〜ましょう', mn:'我們（一起）〜吧',
+    us:'動詞ます形去ます＋ましょう，表示提議或邀請對方一起做某事。',
+    ex:'一緒に食べましょう！', ek:'いっしょにたべましょう！', ez:'我們一起吃吧！'
+  },
+  {
+    pt:'〜ませんか', mn:'要不要（一起）〜？',
+    us:'動詞ます形去ます＋ませんか，委婉地邀請對方做某事，比ましょう更客氣。',
+    ex:'コーヒーを飲みませんか。', ek:'コーヒーをのみませんか。', ez:'要不要喝咖啡？'
+  },
+  {
+    pt:'〜が好き／嫌い／上手／下手', mn:'喜歡／討厭／擅長／不擅長〜',
+    us:'用「が」標示情感或能力的對象，接な形容詞。注意是「が」不是「を」。',
+    ex:'私は音楽が好きです。', ek:'わたしはおんがくがすきです。', ez:'我喜歡音樂。'
+  },
+  {
+    pt:'〜より〜の方が', mn:'比起〜，〜更〜',
+    us:'「AよりBの方が＋形容詞」用於兩者比較，表示B的程度高於A。',
+    ex:'犬より猫の方が好きです。', ek:'いぬよりねこのほうがすきです。', ez:'比起狗，更喜歡貓。'
+  },
+  {
+    pt:'〜と思います', mn:'我認為〜',
+    us:'普通形（常體）＋と思います，表示說話者的看法、推測或意見。',
+    ex:'明日は雨だと思います。', ek:'あしたはあめだとおもいます。', ez:'我認為明天會下雨。'
+  },
+  {
+    pt:'〜から（理由）', mn:'因為〜，所以〜',
+    us:'「から」接在原因子句後面，表示因果關係。注意和「から」（起點）的區別。',
+    ex:'眠いから、早く寝ます。', ek:'ねむいから、はやくねます。', ez:'因為想睡，所以早點睡。'
+  },
+  {
+    pt:'〜とき', mn:'〜的時候',
+    us:'名詞の／動詞普通形＋とき，表示某個特定的時間點或情境。',
+    ex:'子供のとき、よく泳ぎました。', ek:'こどものとき、よくおよぎました。', ez:'小時候，常常游泳。'
+  },
+  {
+    pt:'〜前に／〜後で', mn:'〜之前 ／ 〜之後',
+    us:'辞書形＋前に（做前動作之前），た形＋後で（做完後動作之後）。',
+    ex:'寝る前に歯を磨きます。', ek:'ねるまえにはをみがきます。', ez:'睡覺前刷牙。'
+  },
+  {
+    pt:'〜があります／います', mn:'有〜；〜在',
+    us:'「あります」用於無生命事物或植物的存在，「います」用於人或動物的存在。',
+    ex:'公園に犬がいます。', ek:'こうえんにいぬがいます。', ez:'公園裡有狗。'
+  },
+  {
+    pt:'い形容詞の活用', mn:'い形容詞的變化規則',
+    us:'現在肯定：〜い ／ 現在否定：〜くない ／ 過去肯定：〜かった ／ 過去否定：〜くなかった。「いい」例外：よくない、よかった。',
+    ex:'昨日は暑かったです。今日は暑くないです。', ek:'きのうはあつかったです。きょうはあつくないです。', ez:'昨天很熱。今天不熱。'
+  },
+  {
+    pt:'な形容詞の活用', mn:'な形容詞的變化規則',
+    us:'現在肯定：〜です ／ 現在否定：〜じゃないです ／ 過去：〜でした ／ 過去否定：〜じゃなかったです。',
+    ex:'部屋はきれいじゃないです。', ek:'へやはきれいじゃないです。', ez:'房間不漂亮。'
+  },
+  {
+    pt:'〜くなる／〜になる', mn:'變得〜',
+    us:'い形容詞→〜くなる，な形容詞／名詞→〜になる，表示狀態或性質的改變。',
+    ex:'日本語が上手になりました。', ek:'にほんごがじょうずになりました。', ez:'日語變得更好了。'
+  },
+  {
+    pt:'〜てから', mn:'（做完）〜之後再〜',
+    us:'動詞て形＋から，強調先做完前項動作，才進行後項。和「後で」不同，更強調順序。',
+    ex:'手を洗ってから食べます。', ek:'てをあらってからたべます。', ez:'洗完手之後再吃。'
+  },
+  {
+    pt:'〜ながら', mn:'一邊〜一邊〜',
+    us:'動詞ます形去ます＋ながら，表示同時進行兩個動作，主要動作在後半句。',
+    ex:'音楽を聞きながら勉強します。', ek:'おんがくをききながらべんきょうします。', ez:'一邊聽音樂一邊學習。'
+  },
+  {
+    pt:'もう〜／まだ〜', mn:'已經〜 ／ 還沒〜',
+    us:'「もう」接肯定表示動作已完成，「まだ」接否定（ていない等）表示尚未完成。',
+    ex:'もう食べました。まだ食べていません。', ek:'もうたべました。まだたべていません。', ez:'已經吃了。還沒吃。'
+  },
+  {
+    pt:'〜ほうがいい', mn:'最好〜；〜比較好',
+    us:'た形＋ほうがいい（建議做），ない形＋ほうがいい（建議不做）。常用於給出建議。',
+    ex:'早く寝たほうがいいですよ。', ek:'はやくねたほうがいいですよ。', ez:'你最好早點睡喔。'
+  },
+  {
+    pt:'〜でしょう', mn:'應該是〜吧',
+    us:'「でしょう」表示推測或確認，語氣較確定，常見於天氣預報等情境。',
+    ex:'明日は晴れでしょう。', ek:'あしたははれでしょう。', ez:'明天應該晴天吧。'
+  },
+  {
+    pt:'どんな〜', mn:'什麼樣的〜',
+    us:'「どんな」用於詢問事物的性質或特徵，回答通常用形容詞來描述。',
+    ex:'どんな音楽が好きですか。', ek:'どんなおんがくがすきですか。', ez:'你喜歡什麼樣的音樂？'
+  },
+  {
+    pt:'〜ごろ', mn:'大約〜（時間點）',
+    us:'「ごろ」表示大致的時間點（幾點左右），不能用於時間長度（那用「〜くらい」）。',
+    ex:'3時ごろ来てください。', ek:'さんじごろきてください。', ez:'請大約3點來。'
+  },
+];
+
+// ═══════════════════════════════
+//  State
+// ═══════════════════════════════
+let vocabPage = 1;
+const PER_PAGE = 20;
+let filteredVocab = [...vocabData];
+let quizType = 'meaning';
+let quizQ = [];
+let qIdx = 0;
+let qScore = 0;
+let totalQ = 10;
+
+// ═══════════════════════════════
+//  Navigation
+// ═══════════════════════════════
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  const pages = ['home','vocab','grammar','quiz'];
+  document.querySelectorAll('nav button')[pages.indexOf(page)].classList.add('active');
+  if (page === 'vocab') renderVocab();
+  if (page === 'grammar') renderGrammar();
+}
+
+// ═══════════════════════════════
+//  Audio (Web Speech API)
+// ═══════════════════════════════
+function speak(text) {
+  if (!('speechSynthesis' in window)) { alert('您的瀏覽器不支援語音功能，建議使用 Chrome 瀏覽器'); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ja-JP';
+  u.rate = 0.85;
+  u.pitch = 1.0;
+  // 等待聲音載入
+  const doSpeak = () => {
+    const voices = speechSynthesis.getVoices();
+    const jaVoice = voices.find(v => v.lang === 'ja-JP' || v.lang.startsWith('ja'));
+    if (jaVoice) u.voice = jaVoice;
+    window.speechSynthesis.speak(u);
+  };
+  if (speechSynthesis.getVoices().length > 0) { doSpeak(); }
+  else { speechSynthesis.onvoiceschanged = doSpeak; }
+}
+
+// ═══════════════════════════════
+//  Vocabulary
+// ═══════════════════════════════
+function renderVocab() {
+  const tbody = document.getElementById('vocab-tbody');
+  const start = (vocabPage - 1) * PER_PAGE;
+  const slice = filteredVocab.slice(start, start + PER_PAGE);
+
+  document.getElementById('vocab-info').textContent =
+    `共 ${filteredVocab.length} 筆，第 ${start + 1}–${Math.min(start + PER_PAGE, filteredVocab.length)} 筆`;
+
+  tbody.innerHTML = slice.map(w => {
+    const safeR = w.r.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<tr>
+      <td>
+        <span class="kanji-text">${w.k}</span>
+        <span class="kana-text">${w.r}</span>
+      </td>
+      <td><span class="pos-badge pos-${w.p}">${w.p}</span></td>
+      <td>${w.m}</td>
+      <td><button class="audio-btn" onclick="speak('${safeR}')" title="朗讀">🔊</button></td>
+    </tr>`;
+  }).join('');
+
+  renderPagination();
+}
+
+function filterVocab() {
+  const s = document.getElementById('vocab-search').value.toLowerCase();
+  const pos = document.getElementById('pos-filter').value;
+  filteredVocab = vocabData.filter(w => {
+    const ms = !s || w.k.includes(s) || w.r.includes(s) || w.m.includes(s);
+    const mp = !pos || w.p === pos;
+    return ms && mp;
+  });
+  vocabPage = 1;
+  renderVocab();
+}
+
+function renderPagination() {
+  const total = Math.ceil(filteredVocab.length / PER_PAGE);
+  document.getElementById('vocab-pagination').innerHTML =
+    Array.from({length: total}, (_,i) => i+1)
+      .map(i => `<button class="page-btn ${i===vocabPage?'active':''}" onclick="goPage(${i})">${i}</button>`)
+      .join('');
+}
+
+function goPage(n) { vocabPage = n; renderVocab(); window.scrollTo(0,0); }
+
+// ═══════════════════════════════
+//  Grammar
+// ═══════════════════════════════
+function renderGrammar() {
+  const s = (document.getElementById('grammar-search').value || '').toLowerCase();
+  const data = grammarData.filter(g =>
+    !s || g.pt.toLowerCase().includes(s) || g.mn.includes(s) || g.us.includes(s)
+  );
+  document.getElementById('grammar-list').innerHTML = data.map((g, i) => {
+    const safeEx = g.ex.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<div class="grammar-card" id="gc${i}">
+      <div class="grammar-header" onclick="toggleG('gc${i}')">
+        <div class="grammar-pattern">${g.pt}</div>
+        <div class="grammar-meaning">${g.mn}</div>
+        <div class="grammar-toggle">▼</div>
+      </div>
+      <div class="grammar-body">
+        <div class="grammar-usage">${g.us}</div>
+        <div class="example-box">
+          <div class="example-jp">${g.ex}</div>
+          <div class="example-kana">${g.ek}</div>
+          <div class="example-zh">${g.ez}</div>
+        </div>
+        <button class="grammar-audio" onclick="speak('${safeEx}')">🔊 朗讀例句</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleG(id) { document.getElementById(id).classList.toggle('open'); }
+
+// ═══════════════════════════════
+//  Quiz
+// ═══════════════════════════════
+function selectType(type, btn) {
+  quizType = type;
+  document.querySelectorAll('.qtype-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function startQuiz() {
+  totalQ = parseInt(document.getElementById('quiz-count-sel').value);
+  const pool = [...vocabData].sort(() => Math.random() - 0.5).slice(0, totalQ);
+  quizQ = pool.map(word => {
+    const wrongs = vocabData.filter(w => w !== word).sort(() => Math.random() - 0.5).slice(0, 3);
+    let question, answer, opts;
+    if (quizType === 'meaning') {
+      question = word.k; answer = word.m;
+      opts = [word, ...wrongs].sort(() => Math.random() - 0.5).map(w => ({label: w.m, val: w.m}));
+    } else if (quizType === 'word') {
+      question = word.m; answer = word.k;
+      opts = [word, ...wrongs].sort(() => Math.random() - 0.5).map(w => ({label: w.k, val: w.k}));
+    } else {
+      question = word.k; answer = word.r;
+      opts = [word, ...wrongs].sort(() => Math.random() - 0.5).map(w => ({label: w.r, val: w.r}));
+    }
+    return {question, answer, opts, word};
+  });
+  qIdx = 0; qScore = 0;
+  document.getElementById('quiz-setup').classList.add('hide');
+  document.getElementById('quiz-active').classList.add('show');
+  document.getElementById('quiz-results').classList.remove('show');
+  showQ();
+}
+
+function showQ() {
+  const q = quizQ[qIdx];
+  document.getElementById('q-count').textContent = `第 ${qIdx+1} 題 / 共 ${totalQ} 題`;
+  document.getElementById('q-score').textContent = `得分：${qScore}`;
+  document.getElementById('progress-fill').style.width = `${(qIdx/totalQ)*100}%`;
+  const hints = {meaning:'選出正確的中文意思', word:'選出正確的日文單字', reading:'選出正確的假名讀音'};
+  document.getElementById('quiz-word').textContent = q.question;
+  document.getElementById('quiz-hint').textContent = hints[quizType];
+  document.getElementById('quiz-options').innerHTML = q.opts.map(opt => {
+    const safeVal = opt.val.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<button class="opt-btn" onclick="checkAns(this,'${safeVal}')">${opt.label}</button>`;
+  }).join('');
+  document.getElementById('next-btn').classList.remove('show');
+}
+
+function checkAns(btn, selected) {
+  const q = quizQ[qIdx];
+  document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+  if (selected === q.answer) {
+    btn.classList.add('correct'); qScore++;
+    speak(q.word.r);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.opt-btn').forEach(b => {
+      if (b.textContent.trim() === q.answer) b.classList.add('correct');
+    });
+  }
+  document.getElementById('q-score').textContent = `得分：${qScore}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  qIdx++;
+  if (qIdx >= totalQ) showResults();
+  else showQ();
+}
+
+function showResults() {
+  document.getElementById('quiz-active').classList.remove('show');
+  document.getElementById('quiz-results').classList.add('show');
+  document.getElementById('progress-fill').style.width = '100%';
+  const pct = Math.round(qScore / totalQ * 100);
+  document.getElementById('result-score').textContent = `${qScore} / ${totalQ}`;
+  const msgs = [
+    [90,'🏆','太厲害了！幾乎全對！繼續保持！'],
+    [70,'👍','不錯喔！再加把勁就可以了！'],
+    [50,'📚','還有進步空間，多複習再來挑戰！'],
+    [0, '💪','別灰心，多練習就會進步！'],
+  ];
+  const [,emoji, msg] = msgs.find(([t]) => pct >= t);
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-msg').textContent = msg;
+}
+
+function resetQuiz() {
+  document.getElementById('quiz-setup').classList.remove('hide');
+  document.getElementById('quiz-active').classList.remove('show');
+  document.getElementById('quiz-results').classList.remove('show');
+  document.getElementById('progress-fill').style.width = '0%';
+}
+
+// ═══════════════════════════════
+//  Init
+// ═══════════════════════════════
+renderVocab();
+renderGrammar();
+</script>
+</body>
+</html>
